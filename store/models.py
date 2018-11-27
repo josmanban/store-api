@@ -1,39 +1,91 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 
+import common.models as CommonModels
+import datetime
 # Create your models here.
 
 class Category(models.Model):
-    name = None    
+    name = models.CharField(
+        max_length = 500
+        )
+    description = models.TextField(blank= True, null = True)
+    parent = models.ForeignKey(
+        'Category',
+        related_name = 'childs',
+        on_delete = models.SET_NULL,
+        null = True
+        )
     class Meta:
         pass
     
 
-class Product(models.Model):    
-    name = None
-    description = None
-    category = None
+class Product(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name = 'productos',
+        on_delete = models.SET_NULL,
+        null = True
+        )
+    name = models.CharField(
+        max_length = 500
+        )
+    description = models.TextField()
+    category = models.ForeignKey(
+        'Category',
+        related_name = 'products',
+        on_delete = models.SET_NULL,
+        null = True
+        )
+    price = models.FloatField()
+    is_active = models.BooleanField(default=True)
 
-    price = None
-
-    is_active = None   
-
-
-    def __init__(self):
-        pass
-
-    class Meta:
-        pass
+   
+class SaleState(CommonModels.State):
+    pass
 
 class Sale(models.Model):
-    pass
+    client =  models.ForeignKey(
+        User,
+        related_name = 'purchases',
+        on_delete = models.SET_NULL,
+        null = True
+        )
+    salesman = models.ForeignKey(
+        User,
+        related_name = 'sales',
+        on_delete = models.SET_NULL,
+        null = True
+        )
+
+    date = models.DateTimeField(default = timezone.now)
+
+    state = models.ForeignKey(
+        SaleState,
+        related_name = 'sales',
+        on_delete = models.SET_NULL,
+        null = True
+        )
+
+    def get_total(self):
+        total = 0
+        for detail in self.details:
+            total += detail.get_total
+        return total
+
 
 class SaleDetail(models.Model):
-    price = None
-    numItems = None
-    product = None
-    pass
-
-    class Meta:
-        pass
+    price = models.FloatField()
+    num_items = models.IntegerField(default=1)
+    product = models.ForeignKey(
+        'Sale',
+        related_name="details",
+        on_delete = models.SET_NULL,
+        null = True
+        )
+    
+    def get_total(self):
+        return self.price*self.num_items
 
 
