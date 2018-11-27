@@ -77,7 +77,7 @@ class Sale(models.Model):
 
 class SaleDetail(models.Model):
     price = models.FloatField()
-    num_items = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=1)
     product = models.ForeignKey(
         'Sale',
         related_name="details",
@@ -86,6 +86,6 @@ class SaleDetail(models.Model):
         )
     
     def get_total(self):
-        return self.price*self.num_items
+        return self.price*self.quantity
 
 
