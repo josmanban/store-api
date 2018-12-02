@@ -15,11 +15,12 @@ class Category(models.Model):
         'Category',
         related_name = 'childs',
         on_delete = models.SET_NULL,
-        null = True
+        null = True,
+        blank = True
         )
-    class Meta:
-        pass
     
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     user = models.ForeignKey(
@@ -38,8 +39,17 @@ class Product(models.Model):
         on_delete = models.SET_NULL,
         null = True
         )
+
+    photo = models.ImageField(
+        upload_to = 'products',
+        null = True
+        )
+
     price = models.FloatField()
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
 
    
 class SaleState(CommonModels.State):
@@ -78,8 +88,14 @@ class Sale(models.Model):
 class SaleDetail(models.Model):
     price = models.FloatField()
     quantity = models.IntegerField(default=1)
-    product = models.ForeignKey(
-        'Sale',
+    sale = models.ForeignKey(
+        Sale,
+        related_name="details",
+        on_delete = models.SET_NULL,
+        null = True
+        )
+    prouct = models.ForeignKey(
+        Product,
         related_name="details",
         on_delete = models.SET_NULL,
         null = True
@@ -87,5 +103,3 @@ class SaleDetail(models.Model):
     
     def get_total(self):
         return self.price*self.quantity
-
-

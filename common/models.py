@@ -7,3 +7,6 @@ class State(models.Model):
         max_length = 500,        
         )
     description = models.TextField()
+
+    def __str__(self):
+        return name
