@@ -116,4 +116,4 @@ dmypy.json
 
 /media
 
-/media/*/default.*
+!/media/*/default.*
